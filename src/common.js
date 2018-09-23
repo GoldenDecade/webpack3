@@ -1,0 +1,1 @@
+export let commonInfo = 'this is commonInfo';

@@ -1,4 +1,5 @@
 const path = require('path')
+const packagejson = require("./package.json");
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -26,7 +27,9 @@ const stylusConfig = isProduction ? ExtractTextPlugin.extract({
 module.exports = {
   entry: {
     'polyfills': './src/promise-polyfill.js',
-    'main': './src/main.js'
+    'main': './src/main.js',
+    'first': './src/first.js',
+    // 'vendor': Object.keys(packagejson.dependencies)//获取生产环境依赖的库
   },
   resolve: {
     alias: {
@@ -63,16 +66,20 @@ module.exports = {
       {
         test: /\.css$/,
         // use: extractCSS.extract({
-          use: cssConfig
+        use: cssConfig
       },
       {
         test: /\.styl$/,
         // use: extractStylus.extract({
-          use: stylusConfig
+        use: stylusConfig
       }
     ]
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      // _: 'lodash', // 用 _ 指代 lodash 库,但是会引入lodash整个库，比较大
+      drop: ['lodash', 'drop'], //由于只是用_.join方法,所以设置join: [module('lodash'), child('join'), ...children?]; 暴露某个模块中单个导出值，只需通过一个“数组路径”进行配置（例如 [module, child, ...children?]）
+    }),
     new HtmlWebpackPlugin({// 相对于webpackConfig.output.path路径而言的，不是相对于当前项目目录结构的。
       title: 'learn&test webpack3',
       filename: 'index.html',
@@ -92,13 +99,38 @@ module.exports = {
     }),
     // extractCSS,
     // extractStylus,
-      new ExtractTextPlugin({
-        filename: 'style.css',
-        disable: !isProduction // 生产环境使用； 开发时候不使用，所以开发时候disable为true
-      }),
+    new ExtractTextPlugin({
+      filename: 'style.css',
+      disable: !isProduction // 生产环境使用； 开发时候不使用，所以开发时候disable为true
+    }),
     new VueLoaderPlugin(), // fix bug:  Make sure to include VueLoaderPlugin in your webpack config.
     // devserver 实现局部刷新
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
+
+    new webpack.optimize.UglifyJsPlugin(),// 压缩代码
+    new webpack.optimize.CommonsChunkPlugin({ // 将第三方库抽离出来了
+      name: 'vendor',
+      filename: '[name].js',
+      minChunks: function (module,count) {
+        console.log(module.resource,`引用次数${count}`);
+        //"有正在处理文件" + "这个文件是 .js 后缀" + "这个文件是在 node_modules 中"
+        return (
+            module.resource &&
+            /\.js$/.test(module.resource) &&
+            module.resource.indexOf(path.join(__dirname, './node_modules')) === 0
+        )
+      }
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'runtime',
+      filename: '[name].js',
+      chunks: ['vendor']
+    }),
+    new webpack.optimize.CommonsChunkPlugin({ // 将entry中的公共文件抽离出来了
+      name: 'common',
+      filename: '[name].js',
+      chunks: ['first','main']//从first.js和second.js中抽取commons chunk
+    }),
   ]
 }
