@@ -12,6 +12,7 @@
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "7.0.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "clean-webpack-plugin": "^0.1.19",
     "cross-env": "^5.2.0",
@@ -26,6 +27,7 @@
     "webpack-dev-server": "2.9.7"
   },
   "dependencies": {
+    "promise-polyfill": "^8.1.0",
     "vue": "^2.5.17",
     "vue-loader": "^15.4.2"
   }

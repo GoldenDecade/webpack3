@@ -25,6 +25,7 @@ const stylusConfig = isProduction ? ExtractTextPlugin.extract({
 }) : ['style-loader', 'css-loader', 'stylus-loader']
 module.exports = {
   entry: {
+    'polyfills': './src/promise-polyfill.js',
     'main': './src/main.js'
   },
   resolve: {
@@ -78,7 +79,8 @@ module.exports = {
       template: './src/index.html',// 相对于webpackConfig.output.path路径（这里配置的是dist目录）而言的，所以这里是./src
       favicon: './src/assets/images/favicon.ico',
       inject: 'body', // 1. true/body  2. head 3. false
-      chunks: ['main', 'vendor'], //在多页面应用时区别不同的entry (及其需要)
+      chunks: ['main', 'polyfills', 'vendor'], //在多页面应用时区别不同的entry (及其需要)
+      // chunks: ['main', 'vendor'], //在多页面应用时区别不同的entry (及其需要)
       minify: {
         collapseWhitespace: true
       },
