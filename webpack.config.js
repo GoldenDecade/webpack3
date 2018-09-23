@@ -11,6 +11,8 @@ const webpack = require('webpack') // devserver 实现局部刷新
 const VueLoaderPlugin = require('vue-loader/lib/plugin'); // fix bug:  Make sure to include VueLoaderPlugin in your webpack config.
 
 const isProduction = process.env.NODE_ENV.includes('production', 0); // 在命令行中配置的时候 会发现process.env.NODE_ENV 长度比production长  原因是后面有空格，因此使用includes(); 不过最好还是在js中配置，而不是在命令行中配置
+console.log(process.env.NODE_ENV);
+console.log(process.env.NODE_ENV.length);
 // const isProduction = process.env.NODE_ENV;
 console.log('isProduction: ' + isProduction);
 const cssConfig = isProduction ? ExtractTextPlugin.extract({
