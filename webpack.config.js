@@ -51,7 +51,7 @@ module.exports = {
   output: {
     // publicPath: '',
     path: __dirname + '/dist',
-    filename: '[name][hash:8].js', // hash（dev） 与 chunkhash
+    filename: isProduction ?  '[name][chunkhash:8].js' : '[name][hash:8].js', // hash（dev） 与 chunkhash
   },
   module: {
     rules: [
