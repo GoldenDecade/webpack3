@@ -96,6 +96,7 @@ body {
 }
 body {
   font-size: 0.14rem;
+  /*font-size: 100%;   !*fix IE 不支持rem (引入了自己写的rem.js就好了，所以一般不要在这里修改) bug*!*/
   color: #222;
   -webkit-tap-highlight-color: transparent; /*点击不闪*/
   -webkit-touch-callout: none;

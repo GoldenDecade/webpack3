@@ -5,11 +5,11 @@ webpack(webpackConfig, (err, stats)=> {
   if(err) {
     console.log('err: '+err);
   }
-  /*process.stdout.write(stats.toString({
+  process.stdout.write(stats.toString({
     colors: true,
     modules: false,
     children: false,
     chunks: false,
     chunkModules: false
-  }))*/
+  }))
 })

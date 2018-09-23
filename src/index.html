@@ -10,6 +10,14 @@
   <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 <body>
+<script>
+  var recalculate = ()=>{
+    document.documentElement.style.fontSize = document.documentElement.clientWidth/7.5 + "px"
+  }
+  recalculate()
+  var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize'
+  window.addEventListener(resizeEvt, recalculate, false)
+</script>
 <section id="app"></section>
 </body>
 </html>
