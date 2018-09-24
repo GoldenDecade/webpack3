@@ -1,8 +1,26 @@
 <template>
-	<div>
-		hello world
+	<div id="main-page">
+    hello ...
+		<section class="wrapper">
+			<section class="item">1</section>
+			<section class="item">2</section>
+			<section class="item item3">3</section>
+		</section>
 	</div>
 </template>
+<style rel="stylesheet" lang="stylus">
+	#main-page
+		width: 100%
+		height: 100%
+		.wrapper
+			display flex
+			justify-content space-around
+			width: 100%
+			height: 30px
+			.item
+				flex 0 0 25%
+				background-color: yellow
+</style>
 <script>
 	export default {
 		name: 'app',

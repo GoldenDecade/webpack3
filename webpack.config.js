@@ -16,22 +16,28 @@ console.log(process.env.NODE_ENV);
 console.log(process.env.NODE_ENV.length);
 // const isProduction = process.env.NODE_ENV;
 console.log('isProduction: ' + isProduction);
-const cssConfig = isProduction ? ExtractTextPlugin.extract({
-  fallback: 'style-loader',
-  use: ['css-loader']
-}) : ['style-loader', 'css-loader']
 /*const cssConfig = isProduction ? ExtractTextPlugin.extract({
   fallback: 'style-loader',
-  use: ['css-loader', 'postcss-loader']
-}) : ['style-loader', 'css-loader', 'postcss-loader']*/
-/*const stylusConfig = isProduction ? ExtractTextPlugin.extract({
+  use: ['css-loader']
+}) : ['style-loader', 'css-loader']*/
+const cssConfig = isProduction ? ExtractTextPlugin.extract({
   fallback: 'style-loader',
-  use: [{ loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader', 'stylus-loader']
-}) : ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader', 'stylus-loader']*/
+  use: ['css-loader', { loader: 'postcss-loader'}]
+}) : ['style-loader', 'css-loader',
+  { loader: 'postcss-loader'}]
 const stylusConfig = isProduction ? ExtractTextPlugin.extract({
   fallback: 'style-loader',
+  use: [{ loader: 'css-loader', options: { importLoaders: 1 } },
+    { loader: 'postcss-loader' },
+    'stylus-loader']
+}) : ['style-loader',
+  { loader: 'css-loader', options: { importLoaders: 1 } },
+  { loader: 'postcss-loader'},
+  'stylus-loader']
+/*const stylusConfig = isProduction ? ExtractTextPlugin.extract({
+  fallback: 'style-loader',
   use: [{ loader: 'css-loader', options: { importLoaders: 1 } },  'stylus-loader']
-}) : ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } },  'stylus-loader']
+}) : ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } },  'stylus-loader']*/
 module.exports = {
   entry: {
     'polyfills': './src/promise-polyfill.js',
@@ -77,7 +83,7 @@ module.exports = {
         use: cssConfig
       },
       {
-        test: /\.styl$/,
+        test: /\.styl|us$/, //  要解决stylus和styl两种文件
         // use: extractStylus.extract({
         use: stylusConfig
       }
