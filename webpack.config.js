@@ -20,10 +20,18 @@ const cssConfig = isProduction ? ExtractTextPlugin.extract({
   fallback: 'style-loader',
   use: ['css-loader']
 }) : ['style-loader', 'css-loader']
+/*const cssConfig = isProduction ? ExtractTextPlugin.extract({
+  fallback: 'style-loader',
+  use: ['css-loader', 'postcss-loader']
+}) : ['style-loader', 'css-loader', 'postcss-loader']*/
+/*const stylusConfig = isProduction ? ExtractTextPlugin.extract({
+  fallback: 'style-loader',
+  use: [{ loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader', 'stylus-loader']
+}) : ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader', 'stylus-loader']*/
 const stylusConfig = isProduction ? ExtractTextPlugin.extract({
   fallback: 'style-loader',
-  use: ['css-loader', 'stylus-loader']
-}) : ['style-loader', 'css-loader', 'stylus-loader']
+  use: [{ loader: 'css-loader', options: { importLoaders: 1 } },  'stylus-loader']
+}) : ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } },  'stylus-loader']
 module.exports = {
   entry: {
     'polyfills': './src/promise-polyfill.js',
@@ -86,7 +94,8 @@ module.exports = {
       template: './src/index.html',// 相对于webpackConfig.output.path路径（这里配置的是dist目录）而言的，所以这里是./src
       favicon: './src/assets/images/favicon.ico',
       inject: 'body', // 1. true/body  2. head 3. false
-      chunks: ['main', 'polyfills', 'vendor'], //在多页面应用时区别不同的entry (及其需要)
+      chunks: [ 'common', 'vendor', 'polyfills', 'main' ],
+
       // chunks: ['main', 'vendor'], //在多页面应用时区别不同的entry (及其需要)
       minify: {
         collapseWhitespace: true
@@ -97,23 +106,28 @@ module.exports = {
       root: path.join(__dirname, './'),
       verbose: false
     }),
-    // extractCSS,
-    // extractStylus,
-    new ExtractTextPlugin({
-      filename: 'style.css',
-      disable: !isProduction // 生产环境使用； 开发时候不使用，所以开发时候disable为true
-    }),
+
     new VueLoaderPlugin(), // fix bug:  Make sure to include VueLoaderPlugin in your webpack config.
     // devserver 实现局部刷新
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
 
     new webpack.optimize.UglifyJsPlugin(),// 压缩代码
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'runtime',// 这个文件不需要在页面中引入 可能是因为chunks是 vendor
+      filename: '[name].js',
+      chunks: ['vendor']
+    }),
+    new webpack.optimize.CommonsChunkPlugin({ // 将entry中的公共文件抽离出来了
+      name: 'common', // 这些文件需要在页面中引入  HTMLwebpackplugin的chunks
+      filename: '[name].js',
+      chunks: ['first','main']//从first.js和second.js中抽取commons chunk
+    }),
     new webpack.optimize.CommonsChunkPlugin({ // 将第三方库抽离出来了
       name: 'vendor',
       filename: '[name].js',
       minChunks: function (module,count) {
-        console.log(module.resource,`引用次数${count}`);
+        // console.log(module.resource,`引用次数${count}`);
         //"有正在处理文件" + "这个文件是 .js 后缀" + "这个文件是在 node_modules 中"
         return (
             module.resource &&
@@ -122,15 +136,12 @@ module.exports = {
         )
       }
     }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'runtime',
-      filename: '[name].js',
-      chunks: ['vendor']
-    }),
-    new webpack.optimize.CommonsChunkPlugin({ // 将entry中的公共文件抽离出来了
-      name: 'common',
-      filename: '[name].js',
-      chunks: ['first','main']//从first.js和second.js中抽取commons chunk
+// extractCSS,
+    // extractStylus,
+    new ExtractTextPlugin({ //必须写在webpack.optimize.CommonsChunkPlugin的下面
+      filename: 'style.css',
+      disable: !isProduction, // 生产环境使用； 开发时候不使用，所以开发时候disable为true
+      allChunks: true,// 使用CommonsChunkPlugin 的时候  这里必须是true
     }),
   ]
 }
